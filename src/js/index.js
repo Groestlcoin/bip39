@@ -1650,16 +1650,16 @@
             },
         },
         {
-            name: "Coinomi, Ledger, Groestlcoinomi",
+            name: "Coinomi, Ledger, Groestlcoinomi, Trezor, Safe T",
             onSelect: function() {
-                DOM.bip32path.val("m/44'/"+DOM.bip44coin.val()+"'/0'");
+                DOM.bip32path.val("m/44'/"+DOM.bip44coin.val()+"'/0'/0");
                 DOM.hardenedAddresses.prop('checked', false);
             },
         },
         {
             name: "Groestlpay, Groestlcoin Samourai",
             onSelect: function() {
-                DOM.bip32path.val("m/44'/0'/0'");
+                DOM.bip32path.val("m/44'/0'/0'/0");
                 DOM.hardenedAddresses.prop('checked', false);
             },
         }
