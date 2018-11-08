@@ -198,15 +198,6 @@
                                 <textarea id="root-key" class="root-key private-data form-control" data-show-qr></textarea>
                             </div>
                         </div>
-                        <div class="form-group litecoin-ltub-container hidden">
-                            <label for="litecoin-use-ltub" class="col-sm-2 control-label">Prefixes</label>
-                            <div class="col-sm-10 checkbox">
-                                <label>
-                                    <input type="checkbox" id="litecoin-use-ltub" class="litecoin-use-ltub" checked="checked">
-                                    Use <code>Ltpv / Ltub</code> instead of <code>xprv / xpub</code>
-                                </label>
-                            </div>
-                        </div>
                     </form>
                 </div>
             </div>
@@ -309,7 +300,7 @@
                                 <div class="form-group">
                                     <label for="bip44-path" class="col-sm-2 control-label">BIP32 Derivation Path</label>
                                     <div class="col-sm-10">
-                                        <input id="bip44-path" type="text" class="path form-control" value="m/44'/0'/0'/0" readonly="readonly">
+                                        <input id="bip44-path" type="text" class="path form-control" value="m/44'/17'/0'/0" readonly="readonly">
                                     </div>
                                 </div>
                             </form>
@@ -347,39 +338,34 @@
                                     </label>
                                 </div>
                                 <div class="form-group">
-                                    <label for="core-path" class="col-sm-2 control-label">Bitcoin Core</label>
+                                    <label for="core-path" class="col-sm-2 control-label">Groestlcoin Core</label>
                                     <div class="col-sm-10">
                                         <p class="form-control no-border">
                                         Use path <code>m/0'/0'</code> with hardened addresses.
                                         </p>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="core-path" class="col-sm-2 control-label">MultiGroestl HD, Groestlwallet, Simple Groestlcoin</label>
+                                    <div class="col-sm-10">
                                         <p class="form-control no-border">
-                                            For more info see the
-                                            <a href="https://github.com/bitcoin/bitcoin/pull/8035" target="_blank">Bitcoin Core BIP32 implementation</a>
+                                            <span>Use path <code>m/0'/0</code> without hardened address.</span>
                                         </p>
                                     </div>
                                 </div>
                                 <div class="form-group">
-                                    <label for="core-path" class="col-sm-2 control-label">Multibit</label>
+                                    <label for="core-path" class="col-sm-2 control-label">Coinomi, Ledger, Groestlcoinomi</label>
                                     <div class="col-sm-10">
                                         <p class="form-control no-border">
-                                            <span>Use path <code>m/0'/0</code>.</span>
-                                        </p>
-                                        <p class="form-control no-border">
-                                            <span>For more info see</span>
-                                            <a href="https://multibit.org/" target="_blank">MultiBit HD</a>
+                                            <span>Use path <code>m/44/17'/0</code> without hardened address.</span>
                                         </p>
                                     </div>
                                 </div>
                                 <div class="form-group">
-                                    <label class="col-sm-2 control-label">Block Explorers</label>
+                                    <label for="core-path" class="col-sm-2 control-label">Groestlpay, Groestlcoin Samourai</label>
                                     <div class="col-sm-10">
                                         <p class="form-control no-border">
-                                            <span>Use path <code>m/44'/0'/0'</code>.</span>
-                                            <span>Only enter the <code>xpub</code> extended key into block explorer search fields, never the <code>xprv</code> key.</span>
-                                        </p>
-                                        <p class="form-control no-border">
-                                            <span>Can be used with</span>:
-                                            <a href="https://blockchain.info/" target="_blank">blockchain.info</a>
+                                            <span>Use path <code>m/44/0'/0</code> without hardened address.</span>
                                         </p>
                                     </div>
                                 </div>
@@ -752,7 +738,7 @@
                     <p>
                         <span>
                             Use private keys at
-                            <a href="https://web.archive.org/web/20150707020924/https://brainwallet.org/" target="_blank">brainwallet.org</a>.
+                            <a href="https://www.groestlcoin.org/paper.html" target="_blank">Legacy paperwallet</a>.
                         </span>
                         <span>Be careful - it can be easy to make mistakes if you don't know what you're doing.</span>
                     </p>
@@ -794,7 +780,7 @@
                     </p>
                     <h3>License</h3>
                     <p>
-                    <span>Please refer to <a href="https://github.com/iancoleman/bip39/blob/master/LICENSE" target="_blank">the software license</a> for more detail.
+                    <span>Please refer to <a href="https://github.com/groestlcoin/bip39/blob/master/LICENSE" target="_blank">the software license</a> for more detail.
                     </span>
                     </p>
                     <p>The software is provided "as is", without warranty of any kind, express or implied, including but not limited to the warranties of merchantability, fitness for a particular purpose and noninfringement. In no event shall the authors or copyright holders be liable for any claim, damages or other liability, whether in an action of contract, tort or otherwise, arising from, out of or in connection with the software or the use or other dealings in the software.</p>
@@ -809,8 +795,8 @@
                     <p>This tool is interoperable with any BIP39 wallet.</p>
                     <p>Some similar tools to this one (ie not consumer wallets) are</p>
                     <p>
-                        <a href="https://bip32jp.github.io/english/">
-                            https://bip32jp.github.io/english/
+                        <a href="https://github.com/Groestlcoin-Archives/bip39">
+                            https://github.com/Groestlcoin-Archives/bip39
                         </a>
                     </p>
                 </div>
@@ -837,7 +823,7 @@
                     <p>
                     <span>Alternatively, download the file from the repository</span>
                     -
-                    <a href="https://github.com/iancoleman/bip39">https://github.com/iancoleman/bip39</a>
+                    <a href="https://github.com/groestlcoin/bip39">https://github.com/groestlcoin/bip39</a>
                     </p>
 
                 </div>
@@ -853,8 +839,8 @@
                     <p>
                         <span>Get the source code from the repository</span>
                         -
-                        <a href="https://github.com/iancoleman/bip39" target="_blank">
-                            https://github.com/iancoleman/bip39
+                        <a href="https://github.com/groestlcoin/bip39" target="_blank">
+                            https://github.com/groestlcoin/bip39
                         </a>
                     </p>
 
@@ -928,6 +914,7 @@
         <script src="js/bootstrap-3.3.7.js"></script>
         <script src="js/levenshtein.js"></script>
         <script src="js/kjua-0.1.1.min.js"></script>
+        <script src="js/grs.js"></script>
         <script src="js/bitcoinjs-3.3.2.js"></script>
         <script src="js/bitcoinjs-extensions.js"></script>
         <script src="js/bitcoinjs-bip38-2.0.2.js"></script>

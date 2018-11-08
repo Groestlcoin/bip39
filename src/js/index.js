@@ -6,7 +6,7 @@
     var seed = null;
     var bip32RootKey = null;
     var bip32ExtendedKey = null;
-    var network = bitcoinjs.bitcoin.networks.bitcoin;
+    var network = bitcoinjs.bitcoin.networks.groestlcoin;
     var addressRowTemplate = $("#address-row-template");
 
     var showIndex = true;
@@ -14,7 +14,6 @@
     var showPubKey = true;
     var showPrivKey = true;
     var showQr = false;
-    var litecoinUseLtub = true;
 
     var entropyChangeTimeoutEvent = null;
     var phraseChangeTimeoutEvent = null;
@@ -49,8 +48,6 @@
     DOM.generate = $(".generate");
     DOM.seed = $(".seed");
     DOM.rootKey = $(".root-key");
-    DOM.litecoinLtubContainer = $(".litecoin-ltub-container");
-    DOM.litecoinUseLtub = $(".litecoin-use-ltub");
     DOM.extendedPrivKey = $(".extended-priv-key");
     DOM.extendedPubKey = $(".extended-pub-key");
     DOM.bip32tab = $("#bip32-tab");
@@ -131,7 +128,6 @@
         DOM.generate.on("click", generateClicked);
         DOM.more.on("click", showMore);
         DOM.rootKey.on("input", delayedRootKeyChanged);
-        DOM.litecoinUseLtub.on("change", litecoinUseLtubChanged);
         DOM.bip32path.on("input", calcForDerivationPath);
         DOM.bip44account.on("input", calcForDerivationPath);
         DOM.bip44change.on("input", calcForDerivationPath);
@@ -157,6 +153,8 @@
         hidePending();
         hideValidationError();
         populateNetworkSelect();
+        networks["0"].onSelect();
+        getDerivationPath();
         populateClientSelect();
     }
 
@@ -175,7 +173,6 @@
     function networkChanged(e) {
         clearDerivedKeys();
         clearAddressesList();
-        DOM.litecoinLtubContainer.addClass("hidden");
         DOM.bitcoinCashAddressTypeContainer.addClass("hidden");
         var networkIndex = e.target.value;
         var network = networks[networkIndex];
@@ -351,17 +348,6 @@
         // Calculate and display
         calcBip32RootKeyFromBase58(rootKeyBase58);
         calcForDerivationPath();
-    }
-
-    function litecoinUseLtubChanged() {
-        litecoinUseLtub = DOM.litecoinUseLtub.prop("checked");
-        if (litecoinUseLtub) {
-            network = bitcoinjs.bitcoin.networks.litecoin;
-        }
-        else {
-            network = bitcoinjs.bitcoin.networks.litecoinXprv;
-        }
-        phraseChanged();
     }
 
     function calcForDerivationPath() {
@@ -638,7 +624,7 @@
     function getDerivationPath() {
         if (bip44TabSelected()) {
             var purpose = parseIntNoNaN(DOM.bip44purpose.val(), 44);
-            var coin = parseIntNoNaN(DOM.bip44coin.val(), 0);
+            var coin = parseIntNoNaN(DOM.bip44coin.val(), 17);
             var account = parseIntNoNaN(DOM.bip44account.val(), 0);
             var change = parseIntNoNaN(DOM.bip44change.val(), 0);
             var path = "m/";
@@ -748,7 +734,7 @@
     function displayBip44Info() {
         // Get the derivation path for the account
         var purpose = parseIntNoNaN(DOM.bip44purpose.val(), 44);
-        var coin = parseIntNoNaN(DOM.bip44coin.val(), 0);
+        var coin = parseIntNoNaN(DOM.bip44coin.val(), 17);
         var account = parseIntNoNaN(DOM.bip44account.val(), 0);
         var path = "m/";
         path += purpose + "'/";
@@ -1633,1017 +1619,47 @@
 
     var networks = [
         {
-            name: "AC - Asiacoin",
+            name: "GRS - Groestlcoin",
             onSelect: function() {
-                network = bitcoinjs.bitcoin.networks.asiacoin;
-                setHdCoin(51);
+                network = bitcoinjs.bitcoin.networks.groestlcoin;
+                setHdCoin(17);
             },
         },
         {
-            name: "ACC - Adcoin",
+            name: "GRS - Groestlcoin Testnet",
             onSelect: function() {
-                network = bitcoinjs.bitcoin.networks.adcoin;
-                setHdCoin(161);
-            },
-        },
-        {
-            name: "AUR - Auroracoin",
-            onSelect: function() {
-                network = bitcoinjs.bitcoin.networks.auroracoin;
-                setHdCoin(85);
-            },
-        },
-        {
-            name: "AXE - Axe",
-            onSelect: function() {
-                network = bitcoinjs.bitcoin.networks.axe;
-                setHdCoin(4242);
-            },
-		},
-		{
-            name: "ANON - ANON",
-            onSelect: function() {
-                network = bitcoinjs.bitcoin.networks.anon;
-                setHdCoin(220);
-            },
-        },
-        {
-            name: "BCA - Bitcoin Atom",
-            onSelect: function() {
-                network = bitcoinjs.bitcoin.networks.atom;
-                setHdCoin(185);
-            },
-        },
-        {
-            name: "BCH - Bitcoin Cash",
-            onSelect: function() {
-                DOM.bitcoinCashAddressTypeContainer.removeClass("hidden");
-                setHdCoin(145);
-            },
-        },
-        {
-            name: "BEET - Beetlecoin",
-            onSelect: function() {
-                network = bitcoinjs.bitcoin.networks.beetlecoin;
-                setHdCoin(800);
-            },
-        },
-        {
-            name: "BELA - Belacoin",
-            onSelect: function() {
-                network = bitcoinjs.bitcoin.networks.belacoin;
-                setHdCoin(73);
-            },
-        },
-        {
-            name: "BLK - BlackCoin",
-            onSelect: function() {
-                network = bitcoinjs.bitcoin.networks.blackcoin;
-                setHdCoin(10);
-            },
-        },
-        {
-            name: "BRIT - Britcoin",
-            onSelect: function() {
-                network = bitcoinjs.bitcoin.networks.britcoin;
-                setHdCoin(70);
-            },
-        },
-        {
-            name: "BSD - Bitsend",
-            onSelect: function() {
-                network = bitcoinjs.bitcoin.networks.bitsend;
-                setHdCoin(91);
-            },
-        },
-        {
-            name: "BTA - Bata",
-            onSelect: function() {
-                network = bitcoinjs.bitcoin.networks.bata;
-                setHdCoin(89);
-            },
-        },
-        {
-            name: "BTC - Bitcoin",
-            onSelect: function() {
-                network = bitcoinjs.bitcoin.networks.bitcoin;
-                setHdCoin(0);
-            },
-        },
-        {
-            name: "BTC - Bitcoin Testnet",
-            onSelect: function() {
-                network = bitcoinjs.bitcoin.networks.testnet;
+                network = bitcoinjs.bitcoin.networks.groestlcointestnet;
                 setHdCoin(1);
-            },
-        },
-		{
-            name: "BITG - Bitcoin Green",
-            onSelect: function() {
-                network = bitcoinjs.bitcoin.networks.bitcoingreen;
-                setHdCoin(222);
-            },
-        },
-        {
-            name: "BTCP - Bitcoin Private",
-            onSelect: function() {
-                network = bitcoinjs.bitcoin.networks.bitcoinprivate;
-                setHdCoin(183);
-            },
-        },
-        {
-            name: "BTCZ - Bitcoinz",
-            onSelect: function() {
-                network = bitcoinjs.bitcoin.networks.bitcoinz;
-                setHdCoin(177);
-            },
-        },
-        {
-            name: "BTDX - BitCloud",
-            onSelect: function() {
-                network = bitcoinjs.bitcoin.networks.bitcloud;
-                setHdCoin(218);
-            },
-        },
-        {
-            name: "BTG - Bitcoin Gold",
-            onSelect: function() {
-                network = bitcoinjs.bitcoin.networks.bgold;
-                setHdCoin(156);
-            },
-        },
-        {
-            name: "BTX - Bitcore",
-            onSelect: function() {
-                network = bitcoinjs.bitcoin.networks.bitcore;
-                setHdCoin(160);
-            },
-        },
-        {
-            name: "CCN - Cannacoin",
-            onSelect: function() {
-                network = bitcoinjs.bitcoin.networks.cannacoin;
-                setHdCoin(19);
-            },
-        },
-        {
-            name: "CESC - Cryptoescudo",
-            onSelect: function() {
-                network = bitcoinjs.bitcoin.networks.cannacoin;
-                setHdCoin(111);
-            },
-        },
-        {
-            name: "CDN - Canadaecoin",
-            onSelect: function() {
-                network = bitcoinjs.bitcoin.networks.canadaecoin;
-                setHdCoin(34);
-            },
-        },
-        {
-            name: "CLAM - Clams",
-            onSelect: function() {
-                network = bitcoinjs.bitcoin.networks.clam;
-                setHdCoin(23);
-            },
-        },
-        {
-            name: "CLO - Callisto",
-            segwitAvailable: false,
-            onSelect: function() {
-                network = bitcoinjs.bitcoin.networks.bitcoin;
-                setHdCoin(820);
-            },
-        },
-        {
-            name: "CLUB - Clubcoin",
-            onSelect: function() {
-                network = bitcoinjs.bitcoin.networks.clubcoin;
-                setHdCoin(79);
-            },
-        },
-        {
-            name: "CMP - Compcoin",
-            onSelect: function() {
-                network = bitcoinjs.bitcoin.networks.compcoin;
-                setHdCoin(71);
-            },
-        },
-        {
-            name: "CRAVE - Crave",
-            onSelect: function() {
-                network = bitcoinjs.bitcoin.networks.crave;
-                setHdCoin(186);
-            },
-        },
-        {
-            name: "CRW - Crown",
-            onSelect: function() {
-                network = bitcoinjs.bitcoin.networks.crown;
-                setHdCoin(72);
-            },
-        },
-        {
-            name: "DASH - Dash",
-            onSelect: function() {
-                network = bitcoinjs.bitcoin.networks.dash;
-                setHdCoin(5);
-            },
-        },
-        {
-            name: "DASH - Dash Testnet",
-            onSelect: function() {
-                network = bitcoinjs.bitcoin.networks.dashtn;
-                setHdCoin(1);
-            },
-        },
-        {
-            name: "DFC - Defcoin",
-            onSelect: function() {
-                network = bitcoinjs.bitcoin.networks.defcoin;
-                setHdCoin(1337);
-            },
-        },
-        {
-            name: "DGB - Digibyte",
-            onSelect: function() {
-                network = bitcoinjs.bitcoin.networks.digibyte;
-                setHdCoin(20);
-            },
-        },
-        {
-            name: "DGC - Digitalcoin",
-            onSelect: function() {
-                network = bitcoinjs.bitcoin.networks.digitalcoin;
-                setHdCoin(18);
-            },
-        },
-        {
-            name: "DMD - Diamond",
-            onSelect: function() {
-                network = bitcoinjs.bitcoin.networks.diamond;
-                setHdCoin(152);
-            },
-        },
-        {
-            name: "DNR - Denarius",
-            onSelect: function() {
-                network = bitcoinjs.bitcoin.networks.denarius;
-                setHdCoin(116);
-            },
-        },
-        {
-            name: "DOGE - Dogecoin",
-            onSelect: function() {
-                network = bitcoinjs.bitcoin.networks.dogecoin;
-                setHdCoin(3);
-            },
-        },
-        {
-            name: "ECN - Ecoin",
-            onSelect: function() {
-                network = bitcoinjs.bitcoin.networks.ecoin;
-                setHdCoin(115);
-            },
-        },
-        {
-            name: "EDRC - Edrcoin",
-            onSelect: function() {
-                network = bitcoinjs.bitcoin.networks.edrcoin;
-                setHdCoin(56);
-            },
-        },
-        {
-            name: "EFL - Egulden",
-            onSelect: function() {
-                network = bitcoinjs.bitcoin.networks.egulden;
-                setHdCoin(78);
-            },
-        },
-        {
-            name: "EMC2 - Einsteinium",
-            onSelect: function() {
-                network = bitcoinjs.bitcoin.networks.einsteinium;
-                setHdCoin(41);
-            },
-        },
-        {
-            name: "ERC - Europecoin",
-            onSelect: function() {
-                network = bitcoinjs.bitcoin.networks.europecoin;
-                setHdCoin(151);
-            },
-        },
-        {
-            name: "ETC - Ethereum Classic",
-            segwitAvailable: false,
-            onSelect: function() {
-                network = bitcoinjs.bitcoin.networks.bitcoin;
-                setHdCoin(61);
-            },
-        },
-        {
-            name: "ETH - Ethereum",
-            onSelect: function() {
-                network = bitcoinjs.bitcoin.networks.bitcoin;
-                setHdCoin(60);
-            },
-        },
-        {
-            name: "EXCL - Exclusivecoin",
-            onSelect: function() {
-                network = bitcoinjs.bitcoin.networks.exclusivecoin;
-                setHdCoin(190);
-            },
-        },
-        {
-            name: "EXCC - ExchangeCoin",
-            onSelect: function() {
-                network = bitcoinjs.bitcoin.networks.exchangecoin;
-                setHdCoin(0);
-            },
-        },
-        {
-            name: "EXP - Expanse",
-            segwitAvailable: false,
-            onSelect: function() {
-                network = bitcoinjs.bitcoin.networks.bitcoin;
-                setHdCoin(40);
-            },
-        },
-        {
-            name: "FJC - Fujicoin",
-            onSelect: function() {
-                network = bitcoinjs.bitcoin.networks.fujicoin;
-                setHdCoin(75);
-            },
-        },
-        {
-            name: "FLASH - Flashcoin",
-            onSelect: function() {
-                network = bitcoinjs.bitcoin.networks.flashcoin;
-                setHdCoin(120);
-            },
-        },
-        {
-            name: "FRST - Firstcoin",
-            onSelect: function() {
-                network = bitcoinjs.bitcoin.networks.firstcoin;
-                setHdCoin(167);
-            },
-        },
-        {
-            name: "FTC - Feathercoin",
-            onSelect: function() {
-                network = bitcoinjs.bitcoin.networks.feathercoin;
-                setHdCoin(8);
-            },
-        },
-        {
-            name: "GAME - GameCredits",
-            onSelect: function() {
-                network = bitcoinjs.bitcoin.networks.game;
-                setHdCoin(101);
-            },
-        },
-        {
-            name: "GBX - Gobyte",
-            onSelect: function() {
-                network = bitcoinjs.bitcoin.networks.gobyte;
-                setHdCoin(176);
-            },
-        },
-        {
-            name: "GCR - GCRCoin",
-            onSelect: function() {
-                network = bitcoinjs.bitcoin.networks.gcr;
-                setHdCoin(79);
-            },
-        },
-        {
-            name: "GRC - Gridcoin",
-            onSelect: function() {
-                network = bitcoinjs.bitcoin.networks.gridcoin;
-                setHdCoin(84);
-            },
-        },
-        {
-            name: "HNC - Helleniccoin",
-            onSelect: function() {
-                network = bitcoinjs.bitcoin.networks.helleniccoin;
-                setHdCoin(168);
-            },
-        },
-		{
-            name: "HUSH - Hush",
-            onSelect: function() {
-                network = bitcoinjs.bitcoin.networks.hush;
-                setHdCoin(197);
-            },
-        },
-        {
-            name: "INSN - Insane",
-            onSelect: function() {
-                network = bitcoinjs.bitcoin.networks.insane;
-                setHdCoin(68);
-            },
-        },
-        {
-            name: "IOP - Iop",
-            onSelect: function() {
-                network = bitcoinjs.bitcoin.networks.iop;
-                setHdCoin(66);
-            },
-        },
-        {
-            name: "IXC - Ixcoin",
-            onSelect: function() {
-                network = bitcoinjs.bitcoin.networks.ixcoin;
-                setHdCoin(86);
-            },
-        },
-        {
-            name: "JBS - Jumbucks",
-            onSelect: function() {
-                network = bitcoinjs.bitcoin.networks.jumbucks;
-                setHdCoin(26);
-            },
-        },
-        {
-            name: "KMD - Komodo",
-            bip49available: false,
-            onSelect: function() {
-                network = bitcoinjs.bitcoin.networks.komodo;
-                setHdCoin(141);
-            },
-        },
-        {
-            name: "KOBO - Kobocoin",
-            bip49available: false,
-            onSelect: function() {
-                network = bitcoinjs.bitcoin.networks.kobocoin;
-                setHdCoin(196);
-            },
-        },
-        {
-            name: "LBC - Library Credits",
-            onSelect: function() {
-                network = bitcoinjs.bitcoin.networks.lbry;
-                setHdCoin(140);
-            },
-        },
-        {
-            name: "LCC - Litecoincash",
-            onSelect: function() {
-                network = bitcoinjs.bitcoin.networks.litecoincash;
-                setHdCoin(192);
-            },
-        },
-        {
-            name: "LDCN - Landcoin",
-            onSelect: function() {
-                network = bitcoinjs.bitcoin.networks.landcoin;
-                setHdCoin(63);
-            },
-        },
-        {
-            name: "LINX - Linx",
-            onSelect: function() {
-                network = bitcoinjs.bitcoin.networks.linx;
-                setHdCoin(114);
-            },
-        },
-        {
-            name: "LTC - Litecoin",
-            onSelect: function() {
-                network = bitcoinjs.bitcoin.networks.litecoin;
-                setHdCoin(2);
-                DOM.litecoinLtubContainer.removeClass("hidden");
-            },
-        },
-        {
-            name: "LYNX - Lynx",
-            onSelect: function() {
-                network = bitcoinjs.bitcoin.networks.lynx;
-                setHdCoin(191);
-            },
-        },
-        {
-            name: "MAZA - Maza",
-            onSelect: function() {
-                network = bitcoinjs.bitcoin.networks.maza;
-                setHdCoin(13);
-            },
-        },
-        {
-            name: "MEC - Megacoin",
-            onSelect: function() {
-                network = bitcoinjs.bitcoin.networks.megacoin;
-                setHdCoin(217);
-            },
-        },
-        {
-            name: "MIX - MIX",
-            segwitAvailable: false,
-            onSelect: function() {
-                network = bitcoinjs.bitcoin.networks.bitcoin;
-                setHdCoin(76);
-            },
-        },
-        {
-            name: "MNX - Minexcoin",
-            onSelect: function() {
-                network = bitcoinjs.bitcoin.networks.minexcoin;
-                setHdCoin(182);
-            },
-        },
-        {
-            name: "MONA - Monacoin",
-            onSelect: function() {
-                network = bitcoinjs.bitcoin.networks.monacoin,
-                setHdCoin(22);
-            },
-        },
-        {
-            name: "MUSIC - Musicoin",
-            segwitAvailable: false,
-            onSelect: function() {
-                network = bitcoinjs.bitcoin.networks.bitcoin;
-                setHdCoin(184);
-            },
-        },
-        {
-            name: "NAV - Navcoin",
-            onSelect: function() {
-                network = bitcoinjs.bitcoin.networks.navcoin;
-                setHdCoin(130);
-            },
-        },
-        {
-            name: "NEBL - Neblio",
-            onSelect: function() {
-                network = bitcoinjs.bitcoin.networks.neblio;
-                setHdCoin(146);
-            },
-        },
-        {
-            name: "NEOS - Neoscoin",
-            onSelect: function() {
-                network = bitcoinjs.bitcoin.networks.neoscoin;
-                setHdCoin(25);
-            },
-        },
-        {
-            name: "NLG - Gulden",
-            onSelect: function() {
-                network = bitcoinjs.bitcoin.networks.gulden;
-                setHdCoin(87);
-            },
-        },
-        {
-            name: "NMC - Namecoin",
-            onSelect: function() {
-                network = bitcoinjs.bitcoin.networks.namecoin;
-                setHdCoin(7);
-            },
-        },
-        {
-            name: "NRG - Energi",
-            onSelect: function() {
-                network = bitcoinjs.bitcoin.networks.energi;
-                setHdCoin(204);
-            },
-        },
-        {
-            name: "NRO - Neurocoin",
-            onSelect: function() {
-                network = bitcoinjs.bitcoin.networks.neurocoin;
-                setHdCoin(110);
-            },
-        },
-        {
-            name: "NSR - Nushares",
-            onSelect: function() {
-                network = bitcoinjs.bitcoin.networks.nushares;
-                setHdCoin(11);
-            },
-        },
-        {
-            name: "NYC - Newyorkc",
-            onSelect: function() {
-                network = bitcoinjs.bitcoin.networks.newyorkc;
-                setHdCoin(179);
-            },
-        },
-        {
-            name: "NVC - Novacoin",
-            onSelect: function() {
-                network = bitcoinjs.bitcoin.networks.novacoin;
-                setHdCoin(50);
-            },
-        },
-        {
-            name: "OK - Okcash",
-            onSelect: function() {
-                network = bitcoinjs.bitcoin.networks.okcash;
-                setHdCoin(69);
-            },
-        },
-        {
-            name: "OMNI - Omnicore",
-            onSelect: function() {
-                network = bitcoinjs.bitcoin.networks.omnicore;
-                setHdCoin(200);
-            },
-        },
-        {
-            name: "ONX - Onixcoin",
-            onSelect: function() {
-                network = bitcoinjs.bitcoin.networks.onixcoin;
-                setHdCoin(174);
-            },
-        },
-		{
-            name: "PHR - Phore",
-            onSelect: function() {
-                network = bitcoinjs.bitcoin.networks.phore;
-                setHdCoin(444);
-            },
-        },
-        {
-            name: "PINK - Pinkcoin",
-            onSelect: function() {
-                network = bitcoinjs.bitcoin.networks.pinkcoin;
-                setHdCoin(117);
-            },
-        },
-        {
-            name: "PIRL - Pirl",
-            segwitAvailable: false,
-            onSelect: function() {
-                network = bitcoinjs.bitcoin.networks.bitcoin;
-                setHdCoin(164);
-            },
-        },
-        {
-            name: "PIVX - PIVX",
-            onSelect: function() {
-                network = bitcoinjs.bitcoin.networks.pivx;
-                setHdCoin(119);
-            },
-        },
-        {
-            name: "PIVX - PIVX Testnet",
-            onSelect: function() {
-                network = bitcoinjs.bitcoin.networks.pivxtestnet;
-                setHdCoin(1);
-            },
-        },
-        {
-            name: "POA - Poa",
-            segwitAvailable: false,
-            onSelect: function() {
-                network = bitcoinjs.bitcoin.networks.bitcoin;
-                setHdCoin(178);
-            },
-        },
-        {
-            name: "POSW - POSWcoin",
-            onSelect: function() {
-                network = bitcoinjs.bitcoin.networks.poswcoin;
-                setHdCoin(47);
-            },
-        },
-        {
-            name: "POT - Potcoin",
-            onSelect: function() {
-                network = bitcoinjs.bitcoin.networks.potcoin;
-                setHdCoin(81);
-            },
-        },
-        {
-            name: "PPC - Peercoin",
-            onSelect: function() {
-                network = bitcoinjs.bitcoin.networks.peercoin;
-                setHdCoin(6);
-            },
-        },
-		{
-            name: "PRJ - ProjectCoin",
-            onSelect: function() {
-                network = bitcoinjs.bitcoin.networks.projectcoin;
-                setHdCoin(533);
-            },
-        },
-        {
-            name: "PSB - Pesobit",
-            onSelect: function() {
-                network = bitcoinjs.bitcoin.networks.pesobit;
-                setHdCoin(62);
-            },
-        },
-        {
-            name: "PUT - Putincoin",
-            onSelect: function() {
-                network = bitcoinjs.bitcoin.networks.putincoin;
-                setHdCoin(122);
-            },
-        },
-        {
-            name: "RBY - Rubycoin",
-            onSelect: function() {
-                network = bitcoinjs.bitcoin.networks.rubycoin;
-                setHdCoin(16);
-            },
-        },
-        {
-            name: "RDD - Reddcoin",
-            onSelect: function() {
-                network = bitcoinjs.bitcoin.networks.reddcoin;
-                setHdCoin(4);
-            },
-        },
-        {
-            name: "RVR - RevolutionVR",
-            onSelect: function() {
-                network = bitcoinjs.bitcoin.networks.revolutionvr;
-                setHdCoin(129);
-            },
-        },
-        {
-          name: "SLS - Salus",
-          onSelect: function() {
-              network = bitcoinjs.bitcoin.networks.salus;
-              setHdCoin(63);
-            },
-        },
-        {
-            name: "SDC - ShadowCash",
-            onSelect: function() {
-                network = bitcoinjs.bitcoin.networks.shadow;
-                setHdCoin(35);
-            },
-        },
-        {
-            name: "SDC - ShadowCash Testnet",
-            onSelect: function() {
-                network = bitcoinjs.bitcoin.networks.shadowtn;
-                setHdCoin(1);
-            },
-        },
-        {
-            name: "SLM - Slimcoin",
-            onSelect: function() {
-                network = bitcoinjs.bitcoin.networks.slimcoin;
-                setHdCoin(63);
-            },
-        },
-        {
-            name: "SLM - Slimcoin Testnet",
-            onSelect: function() {
-                network = bitcoinjs.bitcoin.networks.slimcointn;
-                setHdCoin(111);
-            },
-        },
-        {
-            name: "SLR - Solarcoin",
-            onSelect: function() {
-                network = bitcoinjs.bitcoin.networks.solarcoin;
-                setHdCoin(58);
-            },
-        },
-        {
-            name: "SMLY - Smileycoin",
-            onSelect: function() {
-                network = bitcoinjs.bitcoin.networks.smileycoin;
-                setHdCoin(59);
-            },
-        },
-        {
-            name: "STASH - Stash",
-            onSelect: function() {
-                network = bitcoinjs.bitcoin.networks.stash;
-                setHdCoin(0xC0C0);
-            },
-        },
-        {
-            name: "STASH - Stash Testnet",
-            onSelect: function() {
-                network = bitcoinjs.bitcoin.networks.stashtn;
-                setHdCoin(0xCAFE);
-            },
-        },
-        {
-            name: "STRAT - Stratis",
-            onSelect: function() {
-                network = bitcoinjs.bitcoin.networks.stratis;
-                setHdCoin(105);
-            },
-        },
-        {
-            name: "TSTRAT - Stratis Testnet",
-            onSelect: function() {
-                network = bitcoinjs.bitcoin.networks.stratistest;
-                setHdCoin(105);
-            },
-        },
-        {
-            name: "SYS - Syscoin",
-            onSelect: function() {
-                network = bitcoinjs.bitcoin.networks.syscoin;
-                setHdCoin(57);
-            },
-        },
-        {
-            name: "THC - Hempcoin",
-            onSelect: function() {
-                network = bitcoinjs.bitcoin.networks.hempcoin;
-                setHdCoin(113);
-            },
-        },
-        {
-            name: "TOA - Toa",
-            onSelect: function() {
-                network = bitcoinjs.bitcoin.networks.toa;
-                setHdCoin(159);
-            },
-        },
-        {
-            name: "USC - Ultimatesecurecash",
-            onSelect: function() {
-                network = bitcoinjs.bitcoin.networks.ultimatesecurecash;
-                setHdCoin(112);
-            },
-        },
-        {
-            name: "USNBT - NuBits",
-            onSelect: function() {
-                network = bitcoinjs.bitcoin.networks.nubits;
-                setHdCoin(12);
-            },
-        },
-        {
-            name: "UNO - Unobtanium",
-            onSelect: function() {
-                network = bitcoinjs.bitcoin.networks.unobtanium;
-                setHdCoin(92);
-            },
-        },
-        {
-            name: "VASH - Vpncoin",
-            onSelect: function() {
-                network = bitcoinjs.bitcoin.networks.vpncoin;
-                setHdCoin(33);
-            },
-        },
-        {
-            name: "VIA - Viacoin",
-            onSelect: function() {
-                network = bitcoinjs.bitcoin.networks.viacoin;
-                setHdCoin(14);
-            },
-        },
-        {
-            name: "VIA - Viacoin Testnet",
-            onSelect: function() {
-                network = bitcoinjs.bitcoin.networks.viacointestnet;
-                setHdCoin(1);
-            },
-        },
-        {
-            name: "VIVO - Vivo",
-            onSelect: function() {
-                network = bitcoinjs.bitcoin.networks.vivo;
-                setHdCoin(166);
-            },
-        },
-        {
-            name: "VTC - Vertcoin",
-            onSelect: function() {
-                network = bitcoinjs.bitcoin.networks.vertcoin;
-                setHdCoin(28);
-            },
-        },
-        {
-            name: "WC - Wincoin",
-            onSelect: function() {
-                network = bitcoinjs.bitcoin.networks.wincoin;
-                setHdCoin(181);
-            },
-        },
-		{
-            name: "XAX - Artax",
-            onSelect: function() {
-                network = bitcoinjs.bitcoin.networks.artax;
-                setHdCoin(219);
-            },
-        },
-        {
-            name: "XBC - Bitcoinplus",
-            onSelect: function() {
-                network = bitcoinjs.bitcoin.networks.bitcoinplus;
-                setHdCoin(65);
-            },
-        },
-        {
-            name: "XMY - Myriadcoin",
-            onSelect: function() {
-                network = bitcoinjs.bitcoin.networks.myriadcoin;
-                setHdCoin(90);
-            },
-        },
-        {
-            name: "XRP - Ripple",
-            onSelect: function() {
-                network = bitcoinjs.bitcoin.networks.bitcoin;
-                setHdCoin(144);
-            },
-        },
-        {
-            name: "XVC - Vcash",
-            onSelect: function() {
-                network = bitcoinjs.bitcoin.networks.vcash;
-                setHdCoin(127);
-            },
-        },
-        {
-            name: "XVG - Verge",
-            onSelect: function() {
-                network = bitcoinjs.bitcoin.networks.verge;
-                setHdCoin(77);
-            },
-        },
-        {
-            name: "XUEZ - Xuez",
-            segwitAvailable: false,
-            onSelect: function() {
-                network = bitcoinjs.bitcoin.networks.xuez;
-                setHdCoin(225);
-            },
-        },
-        {
-            name: "XWC - Whitecoin",
-            onSelect: function() {
-                network = bitcoinjs.bitcoin.networks.whitecoin;
-                setHdCoin(155);
-            },
-        },
-        {
-            name: "XZC - Zcoin",
-            onSelect: function() {
-                network = bitcoinjs.bitcoin.networks.zcoin;
-                setHdCoin(136);
-            },
-        },
-        {
-            name: "ZCL - Zclassic",
-            onSelect: function() {
-                network = bitcoinjs.bitcoin.networks.zclassic;
-                setHdCoin(147);
-            },
-        },
-        {
-            name: "ZEC - Zcash",
-            onSelect: function() {
-                network = bitcoinjs.bitcoin.networks.zcash;
-                setHdCoin(133);
-            },
-        },
-        {
-            name: "ZEN - Zencash",
-            onSelect: function() {
-                network = bitcoinjs.bitcoin.networks.zencash;
-                setHdCoin(121);
             },
         },
     ]
 
     var clients = [
         {
-            name: "Bitcoin Core",
+            name: "Groestlcoin Core",
             onSelect: function() {
                 DOM.bip32path.val("m/0'/0'");
                 DOM.hardenedAddresses.prop('checked', true);
             },
         },
         {
-            name: "blockchain.info",
-            onSelect: function() {
-                DOM.bip32path.val("m/44'/0'/0'");
-                DOM.hardenedAddresses.prop('checked', false);
-            },
-        },
-        {
-            name: "MultiBit HD",
+            name: "MultiGroestl HD, Groestlwallet, Simple Groestlcoin",
             onSelect: function() {
                 DOM.bip32path.val("m/0'/0");
                 DOM.hardenedAddresses.prop('checked', false);
             },
         },
         {
-            name: "Coinomi, Ledger",
+            name: "Coinomi, Ledger, Groestlcoinomi",
             onSelect: function() {
                 DOM.bip32path.val("m/44'/"+DOM.bip44coin.val()+"'/0'");
+                DOM.hardenedAddresses.prop('checked', false);
+            },
+        },
+        {
+            name: "Groestlpay, Groestlcoin Samourai",
+            onSelect: function() {
+                DOM.bip32path.val("m/44'/0'/0'");
                 DOM.hardenedAddresses.prop('checked', false);
             },
         }
