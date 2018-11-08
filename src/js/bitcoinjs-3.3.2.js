@@ -12276,6 +12276,7 @@ module.exports = function (checksumFn) {
 
 var createHash = require('create-hash')
 var bs58checkBase = require('./base')
+var Buffer = require('safe-buffer').Buffer
 
 // SHA256(SHA256(buffer))
 function sha256x2 (buffer) {
@@ -12309,7 +12310,7 @@ function hex2bytes(s) {
 
 module.exports = bs58checkBase(groestlx2)
 
-},{"./base":82,"create-hash":85}],84:[function(require,module,exports){
+},{"./base":82,"create-hash":85,"safe-buffer":101}],84:[function(require,module,exports){
 var Buffer = require('safe-buffer').Buffer
 var Transform = require('stream').Transform
 var StringDecoder = require('string_decoder').StringDecoder
