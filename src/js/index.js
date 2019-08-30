@@ -488,6 +488,9 @@
     function calcBip32RootKeyFromSeed(phrase, passphrase) {
         seed = mnemonic.toSeed(phrase, passphrase);
         bip32RootKey = bitcoinjs.bitcoin.HDNode.fromSeedHex(seed, network);
+        if(isGRS())
+            bip32RootKey = groestlcoinjs.HDNode.fromSeedHex(seed, network);
+
     }
 
     function calcBip32RootKeyFromBase58(rootKeyBase58) {
@@ -503,14 +506,26 @@
                 bip32RootKey = bitcoinjs.bitcoin.HDNode.fromBase58(rootKeyBase58, n);
                 return;
             }
-            catch (e) {}
+            catch (e) {
+                try {
+                    bip32RootKey = groestlcoinjs.HDNode.fromBase58(rootKeyBase58, n);
+                    return;
+                }
+                catch(e) {}
+            }
             // try parsing using p2wpkh params
             if ("p2wpkh" in n) {
                 try {
                     bip32RootKey = bitcoinjs.bitcoin.HDNode.fromBase58(rootKeyBase58, n.p2wpkh);
                     return;
                 }
-                catch (e) {}
+                catch (e) {
+                    try {
+                        bip32RootKey = groestlcoinjs.HDNode.fromBase58(rootKeyBase58, n.p2wpkh);
+                        return;
+                    }
+                    catch(e) {}
+                }
             }
             // try parsing using p2wpkh-in-p2sh network params
             if ("p2wpkhInP2sh" in n) {
@@ -518,11 +533,22 @@
                     bip32RootKey = bitcoinjs.bitcoin.HDNode.fromBase58(rootKeyBase58, n.p2wpkhInP2sh);
                     return;
                 }
-                catch (e) {}
+                catch (e) {
+                    try {
+                        bip32RootKey = groestlcoinjs.HDNode.fromBase58(rootKeyBase58, n.p2wpkhInP2sh);
+                        return;
+                    }
+                    catch(e) {}
+                }
             }
         }
         // try the network params as currently specified
-        bip32RootKey = bitcoinjs.bitcoin.HDNode.fromBase58(rootKeyBase58, network);
+        try {
+            bip32RootKey = bitcoinjs.bitcoin.HDNode.fromBase58(rootKeyBase58, network);
+        }
+        catch (e) {
+            bip32RootKey = groestlcoinjs.HDNode.fromBase58(rootKeyBase58, network);
+        }
     }
 
     function calcBip32ExtendedKey(path) {
@@ -607,14 +633,26 @@
                 bitcoinjs.bitcoin.HDNode.fromBase58(rootKeyBase58, n);
                 return "";
             }
-            catch (e) {}
+            catch (e) {
+                try {
+                    groestlcoinjs.HDNode.fromBase58(rootKeyBase58, n);
+                    return "";
+                }
+                catch(e) {}
+            }
             // try parsing using p2wpkh params
             if ("p2wpkh" in n) {
                 try {
                     bitcoinjs.bitcoin.HDNode.fromBase58(rootKeyBase58, n.p2wpkh);
                     return "";
                 }
-                catch (e) {}
+                catch (e) {
+                    try {
+                        groestlcoinjs.HDNode.fromBase58(rootKeyBase58, n.p2wpkh);
+                        return "";
+                    }
+                    catch(e) {}
+                }
             }
             // try parsing using p2wpkh-in-p2sh network params
             if ("p2wpkhInP2sh" in n) {
@@ -622,7 +660,13 @@
                     bitcoinjs.bitcoin.HDNode.fromBase58(rootKeyBase58, n.p2wpkhInP2sh);
                     return "";
                 }
-                catch (e) {}
+                catch (e) {
+                    try {
+                        groestlcoinjs.HDNode.fromBase58(rootKeyBase58, n.p2wpkhInP2sh);
+                        return "";
+                    }
+                    catch(e) {}
+                }
             }
         }
         // try the network params as currently specified
@@ -630,7 +674,12 @@
             bitcoinjs.bitcoin.HDNode.fromBase58(rootKeyBase58, network);
         }
         catch (e) {
-            return "Invalid root key";
+            try {
+                groestlcoinjs.HDNode.fromBase58(rootKeyBase58, network);
+            }
+            catch(e) {
+                return "Invalid root key";
+            }
         }
         return "";
     }
@@ -743,6 +792,10 @@
             return "Hardened derivation path is invalid with xpub key";
         }
         return false;
+    }
+
+    function isGRS() {
+        return networks[DOM.network.val()].name == "GRS - Groestlcoin" || networks[DOM.network.val()].name == "GRS - Groestlcoin Testnet";
     }
 
     function displayBip44Info() {
@@ -888,6 +941,9 @@
                 var useUncompressed = useBip38;
                 if (useUncompressed) {
                     keyPair = new bitcoinjs.bitcoin.ECPair(keyPair.d, null, { network: network, compressed: false });
+                    if(isGRS())
+                        keyPair = new groestlcoinjs.ECPair(keyPair.d, null, { network: network, compressed: false });
+
                 }
                 // get address
                 var address = keyPair.getAddress().toString();
@@ -898,9 +954,14 @@
                     privkey = keyPair.toWIF();
                     // BIP38 encode private key if required
                     if (useBip38) {
-                        privkey = bitcoinjsBip38.encrypt(keyPair.d.toBuffer(), false, bip38password, function(p) {
-                            console.log("Progressed " + p.percent.toFixed(1) + "% for index " + index);
-                        });
+                        if(isGRS())  
+                            privkey = groestlcoinjsBip38.encrypt(keyPair.d.toBuffer(), false, bip38password, function(p) {
+                                console.log("Progressed " + p.percent.toFixed(1) + "% for index " + index);
+                            }, null, networks[DOM.network.val()].name.includes("Testnet"));
+                        else
+                            privkey = bitcoinjsBip38.encrypt(keyPair.d.toBuffer(), false, bip38password, function(p) {
+                                console.log("Progressed " + p.percent.toFixed(1) + "% for index " + index);
+                            });
                     }
                 }
                 // get pubkey
@@ -1008,6 +1069,23 @@
                     address = ""
                     pubkey = eosUtil.bufferToPublic(keyPair.getPublicKeyBuffer());
                     privkey = eosUtil.bufferToPrivate(keyPair.d.toBuffer(32));
+                }
+
+                //Groestlcoin Addresses are different
+                if(isGRS()) {
+
+                    if (isSegwit) {
+                        if (!segwitAvailable) {
+                            return;
+                        }
+                        if (isP2wpkh) {
+                            address = groestlcoinjs.address.fromOutputScript(scriptpubkey, network)
+                        }
+                        else if (isP2wpkhInP2sh) {
+                            address = groestlcoinjs.address.fromOutputScript(scriptpubkey, network)
+                        }
+                    } 
+                    //non-segwit addresses are handled by using groestlcoinjs for bip32RootKey
                 }
 
                 addAddressToList(indexText, address, pubkey, privkey);
@@ -2189,6 +2267,20 @@
             onSelect: function() {
                 network = bitcoinjs.bitcoin.networks.gridcoin;
                 setHdCoin(84);
+            },
+        },
+        {
+            name: "GRS - Groestlcoin",
+            onSelect: function() {
+                network = bitcoinjs.bitcoin.networks.groestlcoin;
+                setHdCoin(17);
+            },
+        },
+        {
+            name: "GRS - Groestlcoin Testnet",
+            onSelect: function() {
+                network = bitcoinjs.bitcoin.networks.groestlcointestnet;
+                setHdCoin(1);
             },
         },
         {
