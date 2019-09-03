@@ -4893,7 +4893,7 @@ var final = function(state) {
   o.bufferInsert64(g, 0, state, 16);
   var t = new Array(16);
   for (var r = 0; r < 14; r++) {
-    
+
     for (var i = 0; i < 16; i++) {
       g[i].setxor64(j64[i].plus(r64[r]).setShiftLeft(56));
     }
@@ -5421,7 +5421,7 @@ u64.prototype.setShiftLeft = function(bits) {
   if (bits > 63) {
     bits = bits % 64;
   }
-  
+
   if (bits > 31) {
     this.hi = this.lo << (bits - 32);
     this.lo = 0;
@@ -28160,13 +28160,13 @@ Script.prototype.runInContext = function (context) {
     if (!(context instanceof Context)) {
         throw new TypeError("needs a 'context' argument.");
     }
-    
+
     var iframe = document.createElement('iframe');
     if (!iframe.style) iframe.style = {};
     iframe.style.display = 'none';
-    
+
     document.body.appendChild(iframe);
-    
+
     var win = iframe.contentWindow;
     var wEval = win.eval, wExecScript = win.execScript;
 
@@ -28175,7 +28175,7 @@ Script.prototype.runInContext = function (context) {
         wExecScript.call(win, 'null');
         wEval = win.eval;
     }
-    
+
     forEach(Object_keys(context), function (key) {
         win[key] = context[key];
     });
@@ -28184,11 +28184,11 @@ Script.prototype.runInContext = function (context) {
             win[key] = context[key];
         }
     });
-    
+
     var winKeys = Object_keys(win);
 
     var res = wEval.call(win, this.code);
-    
+
     forEach(Object_keys(win), function (key) {
         // Avoid copying circular objects like `top` and `window` by only
         // updating existing context properties or new properties in the `win`
@@ -28203,9 +28203,9 @@ Script.prototype.runInContext = function (context) {
             defineProp(context, key, win[key]);
         }
     });
-    
+
     document.body.removeChild(iframe);
-    
+
     return res;
 };
 
@@ -28286,22 +28286,22 @@ function hash256 (buffer) {
   ).digest()
 }
 
-function getAddress (d, compressed) {
+function getAddress (d, compressed, testnet) {
   var Q = curve.G.multiply(d).getEncoded(compressed)
   var hash = hash160(Q)
   var payload = Buffer.allocUnsafe(21)
-  payload.writeUInt8(0x24, 0) // XXX TODO FIXME bitcoin only??? damn you BIP38
+  payload.writeUInt8(testnet ? 0x6f : 0x24, 0) // XXX TODO FIXME bitcoin only??? damn you BIP38
   hash.copy(payload, 1)
 
   return bs58grscheck.encode(payload)
 }
 
-function encryptRaw (buffer, compressed, passphrase, progressCallback, scryptParams) {
+function encryptRaw (buffer, compressed, passphrase, progressCallback, scryptParams, testnet) {
   if (buffer.length !== 32) throw new Error('Invalid private key length')
   scryptParams = scryptParams || SCRYPT_PARAMS
 
   var d = BigInteger.fromBuffer(buffer)
-  var address = getAddress(d, compressed)
+  var address = getAddress(d, compressed, testnet)
   var secret = Buffer.from(passphrase, 'utf8')
   var salt = hash256(address).slice(0, 4)
 
@@ -28331,12 +28331,12 @@ function encryptRaw (buffer, compressed, passphrase, progressCallback, scryptPar
   return result
 }
 
-function encrypt (buffer, compressed, passphrase, progressCallback, scryptParams) {
-  return bs58check.encode(encryptRaw(buffer, compressed, passphrase, progressCallback, scryptParams))
+function encrypt (buffer, compressed, passphrase, progressCallback, scryptParams, testnet) {
+  return bs58check.encode(encryptRaw(buffer, compressed, passphrase, progressCallback, scryptParams, testnet))
 }
 
 // some of the techniques borrowed from: https://github.com/pointbiz/bitaddress.org
-function decryptRaw (buffer, passphrase, progressCallback, scryptParams) {
+function decryptRaw (buffer, passphrase, progressCallback, scryptParams, testnet) {
   // 39 bytes: 2 bytes prefix, 37 bytes payload
   if (buffer.length !== 39) throw new Error('Invalid BIP38 data length')
   if (buffer.readUInt8(0) !== 0x01) throw new Error('Invalid BIP38 prefix')
@@ -28372,7 +28372,7 @@ function decryptRaw (buffer, passphrase, progressCallback, scryptParams) {
 
   // verify salt matches address
   var d = BigInteger.fromBuffer(privateKey)
-  var address = getAddress(d, compressed)
+  var address = getAddress(d, compressed, address)
   var checksum = hash256(address).slice(0, 4)
   assert.deepEqual(salt, checksum)
 
@@ -28382,8 +28382,8 @@ function decryptRaw (buffer, passphrase, progressCallback, scryptParams) {
   }
 }
 
-function decrypt (string, passphrase, progressCallback, scryptParams) {
-  return decryptRaw(bs58check.decode(string), passphrase, progressCallback, scryptParams)
+function decrypt (string, passphrase, progressCallback, scryptParams, testnet) {
+  return decryptRaw(bs58check.decode(string), passphrase, progressCallback, scryptParams, testnet)
 }
 
 function decryptECMult (buffer, passphrase, progressCallback, scryptParams) {

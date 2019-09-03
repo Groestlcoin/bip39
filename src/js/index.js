@@ -886,7 +886,7 @@
                     if (useBip38) {
                         privkey = groestlcoinjsBip38.encrypt(keyPair.d.toBuffer(), false, bip38password, function(p) {
                             console.log("Progressed " + p.percent.toFixed(1) + "% for index " + index);
-                        });
+                        }, null, networks[DOM.network.val()].name.includes("Testnet"));
                     }
                 }
                 // get pubkey
