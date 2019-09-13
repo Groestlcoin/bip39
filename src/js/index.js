@@ -494,6 +494,10 @@
     }
 
     function calcBip32RootKeyFromBase58(rootKeyBase58) {
+        if(isGRS()) {
+            calcBip32RootKeyFromBase58GRS(rootKeyBase58);
+            return;
+        }
         // try parsing with various segwit network params since this extended
         // key may be from any one of them.
         if (networkHasSegwit()) {
@@ -506,26 +510,14 @@
                 bip32RootKey = bitcoinjs.bitcoin.HDNode.fromBase58(rootKeyBase58, n);
                 return;
             }
-            catch (e) {
-                try {
-                    bip32RootKey = groestlcoinjs.HDNode.fromBase58(rootKeyBase58, n);
-                    return;
-                }
-                catch(e) {}
-            }
+            catch (e) {}
             // try parsing using p2wpkh params
             if ("p2wpkh" in n) {
                 try {
                     bip32RootKey = bitcoinjs.bitcoin.HDNode.fromBase58(rootKeyBase58, n.p2wpkh);
                     return;
                 }
-                catch (e) {
-                    try {
-                        bip32RootKey = groestlcoinjs.HDNode.fromBase58(rootKeyBase58, n.p2wpkh);
-                        return;
-                    }
-                    catch(e) {}
-                }
+                catch (e) {}
             }
             // try parsing using p2wpkh-in-p2sh network params
             if ("p2wpkhInP2sh" in n) {
@@ -533,22 +525,46 @@
                     bip32RootKey = bitcoinjs.bitcoin.HDNode.fromBase58(rootKeyBase58, n.p2wpkhInP2sh);
                     return;
                 }
-                catch (e) {
-                    try {
-                        bip32RootKey = groestlcoinjs.HDNode.fromBase58(rootKeyBase58, n.p2wpkhInP2sh);
-                        return;
-                    }
-                    catch(e) {}
-                }
+                catch (e) {}
             }
         }
         // try the network params as currently specified
-        try {
-            bip32RootKey = bitcoinjs.bitcoin.HDNode.fromBase58(rootKeyBase58, network);
+        bip32RootKey = bitcoinjs.bitcoin.HDNode.fromBase58(rootKeyBase58, network);
+    }
+
+    function calcBip32RootKeyFromBase58GRS(rootKeyBase58) {
+        // try parsing with various segwit network params since this extended
+        // key may be from any one of them.
+        if (networkHasSegwit()) {
+            var n = network;
+            if ("baseNetwork" in n) {
+                n = bitcoinjs.bitcoin.networks[n.baseNetwork];
+            }
+            // try parsing using base network params
+            try {
+                bip32RootKey = groestlcoinjs.HDNode.fromBase58(rootKeyBase58, n);
+                return;
+            }
+            catch (e) {}
+            // try parsing using p2wpkh params
+            if ("p2wpkh" in n) {
+                try {
+                    bip32RootKey = groestlcoinjs.HDNode.fromBase58(rootKeyBase58, n.p2wpkh);
+                    return;
+                }
+                catch (e) {}
+            }
+            // try parsing using p2wpkh-in-p2sh network params
+            if ("p2wpkhInP2sh" in n) {
+                try {
+                    bip32RootKey = groestlcoinjs.HDNode.fromBase58(rootKeyBase58, n.p2wpkhInP2sh);
+                    return;
+                }
+                catch (e) {}
+            }
         }
-        catch (e) {
-            bip32RootKey = groestlcoinjs.HDNode.fromBase58(rootKeyBase58, network);
-        }
+        // try the network params as currently specified
+        bip32RootKey = groestlcoinjs.HDNode.fromBase58(rootKeyBase58, network);
     }
 
     function calcBip32ExtendedKey(path) {
@@ -621,6 +637,9 @@
     }
 
     function validateRootKey(rootKeyBase58) {
+        if(isGRS()) 
+            return validateRootKeyGRS(rootKeyBase58);
+            
         // try various segwit network params since this extended key may be from
         // any one of them.
         if (networkHasSegwit()) {
@@ -633,26 +652,14 @@
                 bitcoinjs.bitcoin.HDNode.fromBase58(rootKeyBase58, n);
                 return "";
             }
-            catch (e) {
-                try {
-                    groestlcoinjs.HDNode.fromBase58(rootKeyBase58, n);
-                    return "";
-                }
-                catch(e) {}
-            }
+            catch (e) {}
             // try parsing using p2wpkh params
             if ("p2wpkh" in n) {
                 try {
                     bitcoinjs.bitcoin.HDNode.fromBase58(rootKeyBase58, n.p2wpkh);
                     return "";
                 }
-                catch (e) {
-                    try {
-                        groestlcoinjs.HDNode.fromBase58(rootKeyBase58, n.p2wpkh);
-                        return "";
-                    }
-                    catch(e) {}
-                }
+                catch (e) {}
             }
             // try parsing using p2wpkh-in-p2sh network params
             if ("p2wpkhInP2sh" in n) {
@@ -660,13 +667,7 @@
                     bitcoinjs.bitcoin.HDNode.fromBase58(rootKeyBase58, n.p2wpkhInP2sh);
                     return "";
                 }
-                catch (e) {
-                    try {
-                        groestlcoinjs.HDNode.fromBase58(rootKeyBase58, n.p2wpkhInP2sh);
-                        return "";
-                    }
-                    catch(e) {}
-                }
+                catch (e) {}
             }
         }
         // try the network params as currently specified
@@ -674,12 +675,48 @@
             bitcoinjs.bitcoin.HDNode.fromBase58(rootKeyBase58, network);
         }
         catch (e) {
+            return "Invalid root key";
+        }
+        return "";
+    }
+
+    function validateRootKeyGRS(rootKeyBase58) {
+        // try various segwit network params since this extended key may be from
+        // any one of them.
+        if (networkHasSegwit()) {
+            var n = network;
+            if ("baseNetwork" in n) {
+                n = bitcoinjs.bitcoin.networks[n.baseNetwork];
+            }
+            // try parsing using base network params
             try {
-                groestlcoinjs.HDNode.fromBase58(rootKeyBase58, network);
+                groestlcoinjs.HDNode.fromBase58(rootKeyBase58, n);
+                return "";
             }
-            catch(e) {
-                return "Invalid root key";
+            catch (e) {}
+            // try parsing using p2wpkh params
+            if ("p2wpkh" in n) {
+                try {
+                    groestlcoinjs.HDNode.fromBase58(rootKeyBase58, n.p2wpkh);
+                    return "";
+                }
+                catch (e) {}
             }
+            // try parsing using p2wpkh-in-p2sh network params
+            if ("p2wpkhInP2sh" in n) {
+                try {
+                    groestlcoinjs.HDNode.fromBase58(rootKeyBase58, n.p2wpkhInP2sh);
+                    return "";
+                }
+                catch (e) {}
+            }
+        }
+        // try the network params as currently specified
+        try {
+            groestlcoinjs.HDNode.fromBase58(rootKeyBase58, network);
+        }
+        catch (e) {
+            return "Invalid root key";
         }
         return "";
     }
